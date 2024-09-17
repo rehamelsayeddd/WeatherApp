@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">Weatherapp</string>
+    <string name="app_name">SkyCast</string>
+    <string name="hello">HELLO</string>
+    <string name="home">Home</string>
+    <string name="favourite">Favourite\n\n</string>
+    <string name="alert">Alert</string>
+    <string name="settings">Settings\n</string>
+    <string name="networkstatus">Network Status\n</string>
+
 </resources>
