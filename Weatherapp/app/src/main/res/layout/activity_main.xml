@@ -8,24 +8,25 @@
     tools:context=".MainActivity">
 
     <!-- Background ImageView to fulfill the entire mobile screen -->
+
     <ImageView
         android:id="@+id/imageView5"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-         app:layout_constraintStart_toStartOf="parent"
-         app:layout_constraintTop_toTopOf="parent"
-         app:srcCompat="@drawable/gradientcloudbg" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/backgroundsplashscreen" />
 
     <ImageView
         android:id="@+id/imageView4"
-        android:layout_width="291dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="60dp"
-        android:layout_marginBottom="176dp"
+        android:layout_width="268dp"
+        android:layout_height="231dp"
+        android:layout_marginStart="68dp"
+        android:layout_marginBottom="132dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/skycastlogo" />
+        app:srcCompat="@drawable/newskycast" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/animationView"

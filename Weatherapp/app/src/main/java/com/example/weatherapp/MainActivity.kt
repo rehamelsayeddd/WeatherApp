@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
             binding.animationView.playAnimation()
             Glide.with(this)
                 .asGif()
-                .load(R.drawable.skycastlogo)
+                .load(R.drawable.newskycast)
                 .into(binding.imageView4)
             handler.postDelayed({
                 binding.animationView.cancelAnimation()
