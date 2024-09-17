@@ -20,8 +20,8 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
-        android:layout_width="419dp"
-        android:layout_height="60dp"
+        android:layout_width="421dp"
+        android:layout_height="63dp"
         android:background="@drawable/bottomnav"
         android:elevation="10dp"
         android:pointerIcon="arrow"
@@ -38,7 +38,7 @@
         android:id="@+id/tvNetworkIndicator"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#EA1717"
+        android:background="#FF5722"
         android:gravity="center"
         android:text="@string/networkstatus"
         android:textColor="#FFFFFF"
