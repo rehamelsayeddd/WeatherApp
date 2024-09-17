@@ -23,10 +23,10 @@ class MainActivity : AppCompatActivity() {
         isFirstLaunch = savedInstanceState == null
         if (isFirstLaunch) {
             binding.animationView.playAnimation()
-//            Glide.with(this)
-//                .asGif()
-//                .load(R.drawable.splashword)
-//                .into(binding.imageView)
+            Glide.with(this)
+                .asGif()
+                .load(R.drawable.skycastlogo)
+                .into(binding.imageView4)
             handler.postDelayed({
                 binding.animationView.cancelAnimation()
                 navigateToHomeActivity()
