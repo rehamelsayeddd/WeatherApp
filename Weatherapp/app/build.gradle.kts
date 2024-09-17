@@ -49,7 +49,7 @@ dependencies {
     implementation("com.google.android.libraries.places:places:3.3.0")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.test.ext:junit-ktx:1.1.5")
-    implementation("libs.androidx.activity")
+    implementation(libs.androidx.activity)
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
