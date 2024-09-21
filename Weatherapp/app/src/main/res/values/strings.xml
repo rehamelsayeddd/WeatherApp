@@ -2,10 +2,10 @@
     <string name="app_name">SkyCast</string>
     <string name="hello">HELLO</string>
     <string name="home">Home</string>
-    <string name="favourite">Favourite\n\n</string>
+    <string name="favourite">Favourite</string>
     <string name="alert">Alert</string>
-    <string name="settings">Settings\n</string>
-    <string name="networkstatus">Network Status\n</string>
+    <string name="settings">Settings</string>
+    <string name="networkstatus">There is no Network Connection</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="alexandria">Alexandria ,Egypt</string>
     <string name="mostlysunny">Mostly Sunny</string>
@@ -13,7 +13,15 @@
     <string name="winds">Wind Speed</string>
     <string name="humidity">Humidity</string>
     <string name="pressure">Pressure</string>
-    <string name="today">Today's Forecast</string>
+    <string name="today">Today\'s Forecast</string>
     <string name="nextdays">Next Five Days Forecast</string>
+    <string name="delete">Delete</string>
+    <string name="savelocation">Save Location</string>
+    <string name="entercityname">Enter City Name</string>
+    <string name="search_map">Search For City</string>
+    <string name="notfoundlocation">Location Not Found</string>
+
+
+    search_map
 
 </resources>
