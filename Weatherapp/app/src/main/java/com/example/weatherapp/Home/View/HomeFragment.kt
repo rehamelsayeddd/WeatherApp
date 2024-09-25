@@ -1,4 +1,4 @@
-package com.example.weatherapp.Home
+package com.example.weatherapp.Home.View
 
 import android.Manifest
 import android.app.Activity
@@ -16,19 +16,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.weatherapp.Database.LocalData
+import com.example.weatherapp.ForecastApiState
+import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
 import com.example.weatherapp.ForecastModel.ForeCastData
+import com.example.weatherapp.Home.ViewModel.HomeViewModel
+import com.example.weatherapp.Home.ViewModel.HomeViewModelFactory
+import com.example.weatherapp.Network.RemoteData
 import com.example.weatherapp.Network.RetrofitInstance
 import com.example.weatherapp.Network.WeatherApiService
+import com.example.weatherapp.Repository.WeatherRepository
+import com.example.weatherapp.SharedKey
+import com.example.weatherapp.SharedPreferenceManager
 import com.example.weatherapp.databinding.FragmentHomeBinding
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -44,10 +52,19 @@ class HomeFragment : Fragment() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var todayAdapter: TodayAdapter
     private lateinit var dailyAdapter: DailyAdapter
+    private lateinit var viewModel: HomeViewModel
+    lateinit var repository: WeatherRepository
+    lateinit var remoteData: RemoteData
+    lateinit var localData: LocalData
+    lateinit var viewModelFactory: HomeViewModelFactory
+    private var mainLongitude:Double =0.0
+    private var mainLatitude: Double =0.0
+
 
     private val weatherApiService: WeatherApiService by lazy {
         RetrofitInstance.api
     }
+
 
     private val requestLocationPermissionsLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -161,6 +178,16 @@ class HomeFragment : Fragment() {
             val cityName = addresses[0].locality ?: "Unknown city"
             binding.tvCity.text = cityName
 
+
+            mainLongitude = location.longitude
+            mainLatitude= location.latitude
+            // Save location to SharedPreferences
+            val sharedPrefManager = SharedPreferenceManager.getInstance(requireContext())
+          //  sharedPrefManager.saveLocationToAlert("current_location", location.longitude, location.latitude)
+
+            sharedPrefManager.saveLocationToAlert(SharedKey.ALERT.name, mainLongitude,mainLatitude)
+
+
             // Fetch weather data after getting the location
             fetchWeatherData(location.latitude, location.longitude)
         } else {
@@ -243,70 +270,49 @@ class HomeFragment : Fragment() {
     }
 
 
+
     private fun fetchWeatherData(latitude: Double, longitude: Double) {
-        lifecycleScope.launch {
-            try {
-                val weatherResponse = weatherApiService.getForeCast(
-                    lat = latitude,
-                    long = longitude,
-                    units = "metric",
-                    apiKey = API_KEY,
-                    lang = "en"
-                )
-
-                if (isAdded){
-                // Update UI with the fetched data
-                    binding.tvCity.text =
-                        "${weatherResponse.city.name}, ${weatherResponse.city.country}" // Display CityName, Country
-                binding.weatherImgView
-                val dateFormat =
-                    java.text.SimpleDateFormat("EEE, d MMM yyyy", java.util.Locale.getDefault())
-                val formattedDate =
-                    dateFormat.format(java.util.Date(weatherResponse.list[0].dt * 1000L))
-                binding.tvDayFormat.text = formattedDate // Set the formatted date
-                binding.tvStatus.text = weatherResponse.list[0].weather[0].description
-                binding.tvTemp.text = "${weatherResponse.list[0].main.temp}°C"
-                binding.pressurePercent.text = "${weatherResponse.list[0].main.pressure} hPa"
-                binding.humidityPercent.text = "${weatherResponse.list[0].main.humidity}%"
-                binding.windPercent.text = "${weatherResponse.list[0].wind.speed} km/h"
-
-                // Load the weather icon into the ImageView using Picasso
-                val iconCode = weatherResponse.list[0].weather[0].icon
-                val iconUrl = "https://openweathermap.org/img/wn/$iconCode@2x.png"
-                Picasso.get().load(iconUrl).into(binding.weatherImgView)
-
-                // Update RecyclerViews with weather forecast data
-                todayAdapter.submitList(
-                    weatherResponse.list.subList(
-                        0,
-                        8
-                    )
-                ) // Assuming 3-hour interval data
-                // dailyAdapter.submitList(weatherResponse.list) // Daily forecast
-
-                // Grouping forecast data by date
-                val dailyForecast = getFiveDayForecast(weatherResponse.list.groupBy { forecast ->
-                    SimpleDateFormat(
-                        "yyyy-MM-dd",
-                        Locale.getDefault()
-                    ).format(Date(forecast.dt * 1000L))
-                }
-                    .map { (_, forecasts) -> forecasts.first() }) // Get the first forecast for each day
-
-                // Update RecyclerViews with the filtered daily forecast data
-                dailyAdapter.submitList(dailyForecast)
-
-            }
-
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Failed to fetch weather data: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        }
+        viewModel.fetchWeather(latitude, longitude, API_KEY, "en", "metric")
     }
+
+    private fun updateUI(weatherData: CurrentWeatherResponse) {
+        // Update todayAdapter with the current day's details
+        todayAdapter.submitList(weatherData.list.subList(0, 8)) // Assuming this is the current day's data
+
+        // Update dailyAdapter with the 5-day forecast
+        val dailyForecast = getFiveDayForecast(weatherData.list)
+        dailyAdapter.submitList(dailyForecast)
+
+        // Update general UI components
+        binding.tvCity.text = "${weatherData.city.name}, ${weatherData.city.country}"
+        val dateFormat = SimpleDateFormat("EEE, d MMM yyyy", Locale.getDefault())
+        val formattedDate = dateFormat.format(Date(weatherData.list[0].dt * 1000L))
+        binding.tvDayFormat.text = formattedDate
+        binding.tvStatus.text = weatherData.list[0].weather[0].description
+        binding.tvTemp.text = "${weatherData.list[0].main.temp}°C"
+        binding.pressurePercent.text = "${weatherData.list[0].main.pressure} hPa"
+        binding.humidityPercent.text = "${weatherData.list[0].main.humidity}%"
+        binding.windPercent.text = "${weatherData.list[0].wind.speed} km/h"
+
+        val iconCode = weatherData.list[0].weather[0].icon
+        val iconUrl = "https://openweathermap.org/img/wn/$iconCode@2x.png"
+        Picasso.get().load(iconUrl).into(binding.weatherImgView)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+
+        remoteData = RemoteData()
+        localData = LocalData(requireContext())
+        repository = WeatherRepository.getInstance(remoteData,localData)
+        viewModelFactory = HomeViewModelFactory(repository)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(HomeViewModel::class.java)
+
+
+
     }
 
     override fun onCreateView(
@@ -332,7 +338,96 @@ class HomeFragment : Fragment() {
         binding.FivedaysRec.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.FivedaysRec.adapter = dailyAdapter
 
+        // Observe the forecast state
+        lifecycleScope.launchWhenStarted {
+            viewModel.forecastState.collect { state ->
+                when (state) {
+                    is ForecastApiState.Loading -> {
+                        // Show loading indicator
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.scrollView2.visibility = View.GONE
+
+
+                    }
+                    is ForecastApiState.Success -> {
+                        // Hide loading indicator and update UI
+                        binding.scrollView2.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.GONE
+                        updateUI(state.data)
+                    }
+                    is ForecastApiState.Error -> {
+                        // Hide loading indicator and show error message
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.scrollView2.visibility = View.GONE
+                        Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+
         // Check location permissions and settings
         checkAndRequestPermissions()
     }
 }
+
+//    private fun fetchWeatherData(latitude: Double, longitude: Double) {
+//        lifecycleScope.launch {
+//            try {
+//                val weatherResponse = weatherApiService.getForeCast(
+//                    lat = latitude,
+//                    long = longitude,
+//                    units = "metric",
+//                    apiKey = API_KEY,
+//                    lang = "en"
+//                )
+//
+//                if (isAdded){
+//                // Update UI with the fetched data
+//                    binding.tvCity.text =
+//                        "${weatherResponse.city.name}, ${weatherResponse.city.country}" // Display CityName, Country
+//                binding.weatherImgView
+//                val dateFormat =
+//                    java.text.SimpleDateFormat("EEE, d MMM yyyy", java.util.Locale.getDefault())
+//                val formattedDate =
+//                    dateFormat.format(java.util.Date(weatherResponse.list[0].dt * 1000L))
+//                binding.tvDayFormat.text = formattedDate // Set the formatted date
+//                binding.tvStatus.text = weatherResponse.list[0].weather[0].description
+//                binding.tvTemp.text = "${weatherResponse.list[0].main.temp}°C"
+//                binding.pressurePercent.text = "${weatherResponse.list[0].main.pressure} hPa"
+//                binding.humidityPercent.text = "${weatherResponse.list[0].main.humidity}%"
+//                binding.windPercent.text = "${weatherResponse.list[0].wind.speed} km/h"
+//
+//                // Load the weather icon into the ImageView using Picasso
+//                val iconCode = weatherResponse.list[0].weather[0].icon
+//                val iconUrl = "https://openweathermap.org/img/wn/$iconCode@2x.png"
+//                Picasso.get().load(iconUrl).into(binding.weatherImgView)
+//
+//                // Update RecyclerViews with weather forecast data
+//                todayAdapter.submitList(
+//                    weatherResponse.list.subList(
+//                        0,
+//                        8
+//                    )
+//                ) // Assuming 3-hour interval data
+//                // dailyAdapter.submitList(weatherResponse.list) // Daily forecast
+//
+//                // Grouping forecast data by date
+//                val dailyForecast = getFiveDayForecast(weatherResponse.list.groupBy { forecast ->
+//                    SimpleDateFormat(
+//                        "yyyy-MM-dd",
+//                        Locale.getDefault()
+//                    ).format(Date(forecast.dt * 1000L))
+//                }
+//                    .map { (_, forecasts) -> forecasts.first() }) // Get the first forecast for each day
+//
+//                // Update RecyclerViews with the filtered daily forecast data
+//                dailyAdapter.submitList(dailyForecast)
+//
+//            }
+//
+//            } catch (e: Exception) {
+//                Toast.makeText(requireContext(), "Failed to fetch weather data: ${e.message}", Toast.LENGTH_LONG).show()
+//            }
+//        }
+//    }
