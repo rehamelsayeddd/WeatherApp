@@ -2,6 +2,7 @@ package com.example.weatherapp.Network
 
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
 import com.example.weatherapp.OneCall.Model.OneCallApi
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -16,11 +17,11 @@ interface WeatherApiService {
             @Query("appid") apiKey: String,
             @Query("lang") lang: String
 
-        ): CurrentWeatherResponse //3adeya
+        ): CurrentWeatherResponse //3adeya w asebo 3ady mn gher ma a3mlo flow/stateflow
 
 //        //for alerts data
         @GET("3.0/onecall")
-        suspend fun getAlerts(
+        suspend fun getAlerts(  //to make alaram receiver if anything is happening to weather
             @Query("lat") lat: Double,
             @Query("lon") long: Double,
             @Query("units") units: String,
@@ -28,6 +29,8 @@ interface WeatherApiService {
             @Query("lang") lang: String
 
         ): OneCallApi //by one call model
+
+
 
     }
 

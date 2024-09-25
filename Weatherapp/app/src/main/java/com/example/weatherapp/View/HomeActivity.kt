@@ -10,9 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
-import com.example.weatherapp.Alert.AlertFragment
-import com.example.weatherapp.Favourite.FavouriteFragment
-import com.example.weatherapp.Home.HomeFragment
+import com.example.weatherapp.Alert.View.AlertFragment
+import com.example.weatherapp.Favourite.View.FavouriteFragment
+import com.example.weatherapp.Home.View.HomeFragment
 import com.example.weatherapp.Network.NetworkUtil
 import com.example.weatherapp.R
 import com.example.weatherapp.Settings.SettingsFragment
