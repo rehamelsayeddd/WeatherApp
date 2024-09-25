@@ -1,14 +1,17 @@
 package com.example.weatherapp.Database
 
+import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
+import com.example.weatherapp.LocationData
 import com.example.weatherapp.OneCall.Model.AlertData
 import com.example.weatherapp.OneCall.Model.OneCallApi
 import kotlinx.coroutines.flow.Flow
 
+@Dao
 interface WeatherDao {
 
     //insert the weather data by network fetching
@@ -46,6 +49,19 @@ interface WeatherDao {
     //deleting specific alert
     @Delete
     suspend fun deleteAlertDataAll(alert: AlertData)
+
+
+    // Save a location
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveLocation(location: LocationData)
+
+    // Get saved locations
+    @Query("SELECT * FROM location_table")
+    fun getSavedLocations(): Flow<List<LocationData>>
+
+    // Delete a specific location by latitude and longitude
+    @Query("DELETE FROM location_table WHERE latitude = :latitude AND longitude = :longitude")
+    suspend fun deleteLocationByCoordinates(latitude: Double, longitude: Double)
 
 
 }
