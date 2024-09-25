@@ -1,29 +1,38 @@
-package com.example.weatherapp.Favourite
+package com.example.weatherapp.Favourite.View
 
 import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
 import android.widget.Toast
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
-import com.example.weatherapp.ForecastModel.ForeCastData
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ItemFavouriteBinding
-import com.squareup.picasso.Picasso
 
 class FavouriteAdapter(
     private val context: Context,
-    private val onDelete: (CurrentWeatherResponse) -> Unit // Listener for delete action
+    private val onDelete: (CurrentWeatherResponse) -> Unit,
+    private val onClick: (CurrentWeatherResponse) -> Unit
 ) : ListAdapter<CurrentWeatherResponse, FavouriteAdapter.FavouriteViewHolder>(DiffCallback()) {
 
     inner class FavouriteViewHolder(private val binding: ItemFavouriteBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(weatherResponse: CurrentWeatherResponse) {
             binding.tvCity.text = weatherResponse.city.name
             binding.tvCountry.text = weatherResponse.city.country
+
+
+
+            itemView.setOnClickListener {
+                // Trigger the onClick listener passed to the adapter
+                onClick(weatherResponse) // Call the onClick lambda with the current weather response
+            }
 
             itemView.setOnLongClickListener {
                 showDeletePopup(weatherResponse)
@@ -32,7 +41,7 @@ class FavouriteAdapter(
         }
 
         private fun showDeletePopup(weatherResponse: CurrentWeatherResponse) {
-            // Inflate and show popup as before
+            // Inflate and show popup
             val inflater = LayoutInflater.from(context)
             val view = inflater.inflate(R.layout.refresh_favourite_item_action_layout, null)
             val myPopupWindow = PopupWindow(view, 400, 210, true)
