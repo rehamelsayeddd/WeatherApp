@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">SkyCast</string>
-    <string name="hello">HELLO</string>
+    <string name="app_name">Skycast</string>
     <string name="home">Home</string>
     <string name="favourite">Favourite</string>
     <string name="alert">Alert</string>
@@ -20,8 +19,52 @@
     <string name="entercityname">Enter City Name</string>
     <string name="search_map">Search For City</string>
     <string name="notfoundlocation">Location Not Found</string>
+    <string name="language">Language</string>
+    <string name="arabic">Arabic</string>
+    <string name="english">English</string>
+    <string name="windspeed">Wind Speed</string>
+    <string name="imperial">Imperial</string>
+    <string name="metric">Metric</string>
+    <string name="temperature">Temperature</string>
+    <string name="celsius">Celsius</string>
+    <string name="fahrenheit">Fahrenheit</string>
+    <string name="kelvin">Kelvin</string>
+    <string name="location">Location</string>
+    <string name="map">Map</string>
+    <string name="gps">GPS</string>
+    <string name="alerts">Alerts</string>
+    <string name="startDate">Start Date</string>
+    <string name="endDate">End Date</string>
+    <string name="fromDate">From</string>
+    <string name="toDate">To</string>
+    <string name="alertnotification">Alert Notification</string>
+    <string name="alertalarm">Alert Alarm</string>
+    <string name="saveAlertData">Save</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="removeDialogmsg">Delete Confirmation</string>
+    <string name="deletAlertConfirm">Are you sure about removing this alert ?</string>
+    <string name="sure">Yes,I\'m sure</string>
+    <string name="notsure">No,I\'m not</string>
+    <string name="nowarnings">No Warnings</string>
+    <string name="enterdatainput">Please enter the Full information</string>
 
 
-    search_map
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 </resources>
