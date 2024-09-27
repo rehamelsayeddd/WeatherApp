@@ -16,6 +16,8 @@ class RemoteData {
     ): Flow<CurrentWeatherResponse> {
         val apiKey = "3f2c5a9a086fa7d7056043da97b35aae"
 
+
+
         return flowOf(apiService.getForeCast(latitude, longitude, units, apiKey, lang)) //return flow
     }
 

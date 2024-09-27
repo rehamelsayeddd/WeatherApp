@@ -60,13 +60,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var viewModel: MapViewModel
 
 
-//    private val viewModel: MapViewModel by viewModels {
-//        MapViewModelFactory(WeatherRepository.getInstance(remoteData, localData))
-//    }
-
     companion object {
         const val AUTOCOMPLETE_REQUEST_CODE = 1
-        const val API_KEY = "3f2c5a9a086fa7d7056043da97b35aae"
+       const val API_KEY = "3f2c5a9a086fa7d7056043da97b35aae"
+
+        const val REQUEST_TYPE = "request_type" // New constant to identify request type
+        const val FROM_SETTINGS = "from_settings" // New constant for settings request
+        const val FROM_FAVORITES = "from_favorites" // New constant for favorites request
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
