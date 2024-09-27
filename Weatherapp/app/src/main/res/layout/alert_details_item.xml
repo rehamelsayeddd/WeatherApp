@@ -115,6 +115,24 @@
                 app:layout_constraintStart_toEndOf="@+id/timeStartTxt"
                 app:layout_constraintTop_toBottomOf="@+id/tv_end_date" />
 
+            <ImageView
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:backgroundTint="#523D7F"
+                android:scaleType="center"
+                app:backgroundTint="@color/black"
+                app:elevation="4dp"
+                app:fabSize="mini"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.979"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:rippleColor="#3cffffff"
+                app:srcCompat="@drawable/delete"
+                app:tint="#523D7F" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
