@@ -113,10 +113,8 @@ class AlertFragment : Fragment(),OnClickInterface {
 
         alertFactory = AlertViewModelFactory(repository)
         viewModel = ViewModelProvider(requireActivity(), alertFactory).get(AlertViewModel::class.java)
-        alertAdapter= AlertAdapter(listOf(),this, {
-            alertItem ->deleteAlert(alertItem)
 
-        })
+        alertAdapter= AlertAdapter(listOf(),this)
 
         linearLayoutManager = LinearLayoutManager(context)
         binding.alertRV.adapter = alertAdapter
