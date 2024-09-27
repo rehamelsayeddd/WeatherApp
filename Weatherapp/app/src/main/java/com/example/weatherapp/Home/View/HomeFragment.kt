@@ -4,11 +4,13 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.IntentSender
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -27,6 +29,7 @@ import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
 import com.example.weatherapp.ForecastModel.ForeCastData
 import com.example.weatherapp.Home.ViewModel.HomeViewModel
 import com.example.weatherapp.Home.ViewModel.HomeViewModelFactory
+import com.example.weatherapp.Network.NetworkUtil
 import com.example.weatherapp.Network.RemoteData
 import com.example.weatherapp.Network.RetrofitInstance
 import com.example.weatherapp.Network.WeatherApiService
@@ -37,6 +40,7 @@ import com.example.weatherapp.databinding.FragmentHomeBinding
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -45,7 +49,8 @@ class HomeFragment : Fragment() {
 
     companion object {
         private const val REQUEST_CHECK_SETTINGS = 1000
-        const val API_KEY = "3f2c5a9a086fa7d7056043da97b35aae"
+      const val API_KEY = "3f2c5a9a086fa7d7056043da97b35aae"
+
     }
 
     private lateinit var binding: FragmentHomeBinding
@@ -59,6 +64,9 @@ class HomeFragment : Fragment() {
     lateinit var viewModelFactory: HomeViewModelFactory
     private var mainLongitude:Double =0.0
     private var mainLatitude: Double =0.0
+    private lateinit var sharedPrefManager: SharedPreferenceManager
+
+
 
 
     private val weatherApiService: WeatherApiService by lazy {
@@ -78,17 +86,34 @@ class HomeFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         checkAndRequestPermissions()
+
     }
 
+
+
+
+
     private fun checkAndRequestPermissions() {
-        if (!checkPermission()) {
-            requestPermission()
-        } else if (!isLocationEnabled(requireContext())) {
-            enableLocation()
+        val sharedPrefManager = SharedPreferenceManager.getInstance(requireContext())
+        val locationPreference = sharedPrefManager.getlocationChoice("location_option", "GPS")
+
+        if (locationPreference == "GPS") {
+            // Proceed with GPS location
+            if (!checkPermission()) {
+                requestPermission()
+            } else if (!isLocationEnabled(requireContext())) {
+                enableLocation()
+            } else {
+                getFreshLocation()
+            }
         } else {
-            getFreshLocation()
+            // Load saved coordinates directly
+            val (latitude, longitude) = sharedPrefManager.getLocationCoordinates()
+            fetchWeatherData(latitude, longitude)
         }
     }
+
+
 
     private fun checkPermission(): Boolean {
         return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
@@ -185,11 +210,17 @@ class HomeFragment : Fragment() {
             val sharedPrefManager = SharedPreferenceManager.getInstance(requireContext())
           //  sharedPrefManager.saveLocationToAlert("current_location", location.longitude, location.latitude)
 
+            sharedPrefManager.saveLocationCoordinates(mainLatitude, mainLongitude) // Store the location coordinates
+
+
             sharedPrefManager.saveLocationToAlert(SharedKey.ALERT.name, mainLongitude,mainLatitude)
 
 
             // Fetch weather data after getting the location
-            fetchWeatherData(location.latitude, location.longitude)
+          //  fetchWeatherData(location.latitude, location.longitude)
+
+            fetchWeatherData(mainLatitude, mainLongitude)
+
         } else {
             Toast.makeText(requireContext(), "Unable to get address from location.", Toast.LENGTH_LONG).show()
         }
@@ -272,10 +303,44 @@ class HomeFragment : Fragment() {
 
 
     private fun fetchWeatherData(latitude: Double, longitude: Double) {
-        viewModel.fetchWeather(latitude, longitude, API_KEY, "en", "metric")
-    }
+      //  viewModel.fetchWeather(latitude, longitude, API_KEY, "en", "metric")
+
+        // Get the saved wind unit from SharedPreferences
+        val windUnit = SharedPreferenceManager.getInstance(requireContext()).getWindUnit("wind_speed", "imperial")
+        // Determine the unit to pass to the API based on the saved preference
+        val unitParameter = if (windUnit == "metric") "metric" else "imperial"
+
+        // Get the saved temperature unit from SharedPreferences
+        val tempUnit = SharedPreferenceManager.getInstance(requireContext()).getTempUnit("temperature_unit", "celsius")
+
+
+        // Get the saved language preference from SharedPreferences
+        val languagePreference = SharedPreferenceManager.getInstance(requireContext()).getLanguage("language", "")
+        val languageForAPI = when (languagePreference) {
+            "ar" -> "ar" // Arabic
+            "en" -> "en" // English
+            else -> ""
+        }
+        Log.d("WeatherAPI", "Fetching weather data for latitude: $latitude, longitude: $longitude, language: $languageForAPI")
+
+
+
+        // Determine the unit to pass to the API based on the saved temperature preference
+        val unitForAPI = when (tempUnit) {
+            "imperial" -> "imperial" // Fahrenheit and mph for wind
+            else -> "metric" // Celsius and m/s for wind
+        }
+
+        // Fetch weather data using the selected unit for the API (metric or imperial)
+       // viewModel.fetchWeather(latitude, longitude, API_KEY, "en", unitForAPI)
+
+        viewModel.fetchWeather(latitude, longitude, API_KEY, languageForAPI, unitForAPI)
+
+        }
 
     private fun updateUI(weatherData: CurrentWeatherResponse) {
+        Log.d("WeatherAPI", "Weather data: $weatherData")
+
         // Update todayAdapter with the current day's details
         todayAdapter.submitList(weatherData.list.subList(0, 8)) // Assuming this is the current day's data
 
@@ -283,16 +348,65 @@ class HomeFragment : Fragment() {
         val dailyForecast = getFiveDayForecast(weatherData.list)
         dailyAdapter.submitList(dailyForecast)
 
+        val languagePreference = SharedPreferenceManager.getInstance(requireContext()).getLanguage("language_key", "")
+
         // Update general UI components
-        binding.tvCity.text = "${weatherData.city.name}, ${weatherData.city.country}"
+      //  binding.tvCity.text = "${weatherData.city.name}, ${weatherData.city.country}"
+
+        // Update based on the language preference
+        val cityName = weatherData.city.name // The name should reflect the selected language
+        val countryName = weatherData.city.country // The country should also reflect the selected language
+        val weatherStatus = weatherData.list[0].weather[0].description // Should reflect the selected language
+
+        Log.d("WeatherAPI", "City: $cityName, Country: $countryName, Status: $weatherStatus")
+
+        binding.tvCity.text = "$cityName, $countryName"
+        binding.tvStatus.text = weatherStatus
+
+
         val dateFormat = SimpleDateFormat("EEE, d MMM yyyy", Locale.getDefault())
         val formattedDate = dateFormat.format(Date(weatherData.list[0].dt * 1000L))
         binding.tvDayFormat.text = formattedDate
-        binding.tvStatus.text = weatherData.list[0].weather[0].description
-        binding.tvTemp.text = "${weatherData.list[0].main.temp}°C"
+
+
+
+        // binding.tvStatus.text = weatherData.list[0].weather[0].description
+
+        // Get temperature unit preference
+        val tempUnit = SharedPreferenceManager.getInstance(requireContext()).getTempUnit("temperature_unit", "celsius")
+
+        // Convert temperature based on the unit
+        val temp = weatherData.list[0].main.temp
+        val tempText = when (tempUnit) {
+            "celsius" -> "${temp}°C" // Celsius
+            "fahrenheit" -> "${(temp * 9/5 + 32).toInt()}°F" // Fahrenheit
+            "kelvin" -> "${(temp + 273.15).toInt()}K" // Kelvin
+            else -> "${temp}°C" // Default to Celsius
+        }
+        binding.tvTemp.text = tempText
+
+        //binding.tvTemp.text = "${weatherData.list[0].main.temp}°C"
+
         binding.pressurePercent.text = "${weatherData.list[0].main.pressure} hPa"
         binding.humidityPercent.text = "${weatherData.list[0].main.humidity}%"
-        binding.windPercent.text = "${weatherData.list[0].wind.speed} km/h"
+
+
+
+        // Get wind unit preference
+        val windUnit = SharedPreferenceManager.getInstance(requireContext()).getWindUnit("wind_speed", "imperial")
+
+        // Convert wind speed based on the unit
+        val windSpeed = weatherData.list[0].wind.speed
+        val windSpeedText = if (windUnit == "metric") {
+            "${windSpeed} m/s" // wind speed in meters/second
+        } else {
+            // Convert m/s to mph (1 m/s = 2.23694 mph)
+            "${(windSpeed * 2.23694).toInt()} mile/h"
+        }
+        binding.windPercent.text = windSpeedText
+
+
+        //  binding.windPercent.text = "${weatherData.list[0].wind.speed} m/h"
 
         val iconCode = weatherData.list[0].weather[0].icon
         val iconUrl = "https://openweathermap.org/img/wn/$iconCode@2x.png"
@@ -323,13 +437,68 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
+    ///////////////////////////////////////////////
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetworkInfo
+        return activeNetwork != null && activeNetwork.isConnected
+    }
+
+    private fun fetchWeatherDataWithFallback(latitude: Double, longitude: Double) {
+        if (isNetworkAvailable()) {
+            // Show loading indicator while fetching data from API
+            binding.progressBar.visibility = View.VISIBLE
+            binding.scrollView2.visibility = View.GONE
+
+            // Try to fetch weather data from the API
+            fetchWeatherData(latitude, longitude)
+        } else {
+            // No internet connection, show loading offline data message
+            Toast.makeText(requireContext(), "No internet connection. Loading offline data.", Toast.LENGTH_SHORT).show()
+
+            // Fetch data from Room and update UI
+            loadOfflineWeatherData()
+        }
+    }
+    private fun loadOfflineWeatherData() {
+        // Show loading indicator while fetching data from Room
+        binding.progressBar.visibility = View.VISIBLE
+        binding.scrollView2.visibility = View.GONE
+
+        lifecycleScope.launch {
+            viewModel.getWeatherData().collect { weatherData ->
+                if (weatherData != null) {
+                    // Update UI with cached data from Room
+                    updateUI(weatherData)
+
+                    // Hide loading indicator
+                    binding.progressBar.visibility = View.GONE
+                    binding.scrollView2.visibility = View.VISIBLE
+                } else {
+                    // No cached data available, hide the loading spinner
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(requireContext(), "No cached data available.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
 
+
+        sharedPrefManager   = SharedPreferenceManager.getInstance(requireContext())
+
         // Initialize adapters
-        todayAdapter = TodayAdapter()
-        dailyAdapter = DailyAdapter()
+        todayAdapter = TodayAdapter(sharedPrefManager)
+
+        dailyAdapter = DailyAdapter(sharedPrefManager)
+
+
+
+
 
         // Set up RecyclerViews
         binding.todayDetailsRecView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -338,38 +507,58 @@ class HomeFragment : Fragment() {
         binding.FivedaysRec.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.FivedaysRec.adapter = dailyAdapter
 
-        // Observe the forecast state
+
         lifecycleScope.launchWhenStarted {
             viewModel.forecastState.collect { state ->
                 when (state) {
                     is ForecastApiState.Loading -> {
-                        // Show loading indicator
-                        binding.progressBar.visibility = View.VISIBLE
-                        binding.scrollView2.visibility = View.GONE
-
-
+                        if (isNetworkAvailable()) {
+                            // Network is available, so show loading indicator
+                            binding.progressBar.visibility = View.VISIBLE
+                            binding.scrollView2.visibility = View.GONE
+                        } else {
+                            // No internet, load offline data
+                            Toast.makeText(requireContext(), "No internet connection. Loading offline data.", Toast.LENGTH_SHORT).show()
+                            loadOfflineWeatherData()
+                        }
                     }
+
                     is ForecastApiState.Success -> {
-                        // Hide loading indicator and update UI
-                        binding.scrollView2.visibility = View.VISIBLE
-                        binding.progressBar.visibility = View.GONE
-                        updateUI(state.data)
+                        if (isNetworkAvailable()) {
+                            // Network is available, hide loading indicator and update UI
+                            binding.scrollView2.visibility = View.VISIBLE
+                            binding.progressBar.visibility = View.GONE
+                            updateUI(state.data)
+                        } else {
+                            // No internet, display cached data if available
+                            Toast.makeText(requireContext(), "No internet connection. Displaying cached data.", Toast.LENGTH_SHORT).show()
+                            loadOfflineWeatherData()
+                        }
                     }
+
                     is ForecastApiState.Error -> {
-                        // Hide loading indicator and show error message
-                        binding.progressBar.visibility = View.VISIBLE
-                        binding.scrollView2.visibility = View.GONE
-                        Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                        if (isNetworkAvailable()) {
+                            // Network is available but there's an error, hide the loading spinner and show error message
+                            binding.progressBar.visibility = View.GONE
+                            binding.scrollView2.visibility = View.VISIBLE
+                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                        } else {
+                            // No internet and an error occurred, load offline data
+                            Toast.makeText(requireContext(), "No internet connection. Loading offline data.", Toast.LENGTH_SHORT).show()
+                            loadOfflineWeatherData()
+                        }
                     }
                 }
             }
         }
-
-
         // Check location permissions and settings
         checkAndRequestPermissions()
     }
+
+
 }
+
+
 
 //    private fun fetchWeatherData(latitude: Double, longitude: Double) {
 //        lifecycleScope.launch {
@@ -431,3 +620,42 @@ class HomeFragment : Fragment() {
 //            }
 //        }
 //    }
+
+//    private fun checkAndRequestPermissions() {
+//        if (!checkPermission()) {
+//            requestPermission()
+//        } else if (!isLocationEnabled(requireContext())) {
+//            enableLocation()
+//        } else {
+//            getFreshLocation()
+//        }
+//    }
+
+// Observe the forecast state
+//        lifecycleScope.launchWhenStarted {
+//            viewModel.forecastState.collect { state ->
+//                when (state) {
+//                    is ForecastApiState.Loading -> {
+//                        // Show loading indicator
+//                        binding.progressBar.visibility = View.VISIBLE
+//                        binding.scrollView2.visibility = View.GONE
+//
+//
+//                    }
+//                    is ForecastApiState.Success -> {
+//                        // Hide loading indicator and update UI
+//                        binding.scrollView2.visibility = View.VISIBLE
+//                        binding.progressBar.visibility = View.GONE
+//                        updateUI(state.data)
+//                    }
+//                    is ForecastApiState.Error -> {
+//                        // Hide loading indicator and show error message
+//                        binding.progressBar.visibility = View.VISIBLE
+//                        binding.scrollView2.visibility = View.GONE
+//                        Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+//
+//                        loadOfflineWeatherData()
+//                    }
+//                }
+//            }
+//        }
