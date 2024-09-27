@@ -20,14 +20,20 @@ class SharedPreferenceManager private constructor(context: Context){
         }
     }
 
-    fun getLanguage(key: String, defaultValue: String): String { return sharedPreferences.getString(key, defaultValue) ?: defaultValue }
+    //language settings
+    fun getLanguage(key: String, defaultValue: String): String {
+        return sharedPreferences.getString(key, defaultValue) ?: defaultValue
+    }
+    fun saveLanguage(key: String, value: String) {
+        sharedPreferences.edit().putString(key, value).apply()
+    }
 
     fun getSavedMap(key: String, defaultValue: String): String {
         return sharedPreferences.getString(key, defaultValue) ?: defaultValue
     }
 
 
-    //save current location
+    //save current location to pass it to alert
     fun saveLocationToAlert(key: String, longt: Double, lat:Double) {
         val editor = sharedPreferences.edit()
         editor.putString(key + "_longt", longt.toString())
@@ -48,9 +54,47 @@ class SharedPreferenceManager private constructor(context: Context){
         return null
     }
 
+    //wind settings
+    fun saveWindUnit(key: String, value: String) {
+        sharedPreferences.edit().putString(key, value).apply()
+    }
+
+    fun getWindUnit(key: String, defaultValue: String): String {
+        return sharedPreferences.getString(key, defaultValue) ?: defaultValue
+    }
 
 
+    //temperature settings
+    fun saveTempUnit(key: String, value: String) {
+        sharedPreferences.edit().putString(key, value).apply()
+    }
+    fun getTempUnit(key: String, defaultValue: String): String {
+        return sharedPreferences.getString(key, defaultValue) ?: defaultValue
+    }
 
+    //location choice
+
+    fun savelocationChoice(key: String, value: String) {
+        sharedPreferences.edit().putString(key, value).apply()
+    }
+    fun getlocationChoice(key: String, defaultValue: String): String {
+        return sharedPreferences.getString(key, defaultValue) ?: defaultValue
+    }
+
+    //saving and getting the chosen location lon and lat
+
+    fun saveLocationCoordinates(latitude: Double, longitude: Double) {
+        val editor = sharedPreferences.edit()
+        editor.putFloat("latitude", latitude.toFloat())
+        editor.putFloat("longitude", longitude.toFloat())
+        editor.apply()
+    }
+
+    fun getLocationCoordinates(): Pair<Double, Double> {
+        val latitude = sharedPreferences.getFloat("latitude", 0.0f).toDouble()
+        val longitude = sharedPreferences.getFloat("longitude", 0.0f).toDouble()
+        return Pair(latitude, longitude)
+    }
 
 
 
