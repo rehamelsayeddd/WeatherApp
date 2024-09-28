@@ -10,14 +10,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.Database.LocalData
-import com.example.weatherapp.ForecastApiState
+import com.example.weatherapp.Home.ViewModel.ForecastApiState
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
 import com.example.weatherapp.ForecastModel.ForeCastData
 import com.example.weatherapp.Favourite.ViewModel.FavouriteViewModel
 import com.example.weatherapp.Favourite.ViewModel.FavouriteViewModelFactory
-import com.example.weatherapp.FavouriteState
 import com.example.weatherapp.Home.View.DailyAdapter
-import com.example.weatherapp.Home.View.HomeFragment
 import com.example.weatherapp.Home.View.HomeFragment.Companion.API_KEY
 import com.example.weatherapp.Home.View.TodayAdapter
 import com.example.weatherapp.Home.ViewModel.HomeViewModel

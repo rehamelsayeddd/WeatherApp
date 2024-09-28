@@ -2,7 +2,7 @@ package com.example.weatherapp.Database
 
 import android.content.Context
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
-import com.example.weatherapp.LocationData
+import com.example.weatherapp.ForecastModel.LocationData
 import com.example.weatherapp.OneCall.Model.AlertData
 import com.example.weatherapp.OneCall.Model.OneCallApi
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +19,7 @@ class LocalData(context: Context) : InterfaceLocalData {
         weatherDao.insertWeatherData(weatherData)
     }
 
-    // Retrieve weather data for HomeFragment when offline
+    // Retrieve weather data for HomeFragment when offline using flow
     override fun getWeatherData(): Flow<CurrentWeatherResponse> {
         return weatherDao.getWeatherData()
     }
@@ -29,7 +29,7 @@ class LocalData(context: Context) : InterfaceLocalData {
         weatherDao.insertFavourite(favorite)
     }
 
-    // Retrieve all favorite locations
+    // Retrieve all favorite locations using flow
     override fun getFavourite(): Flow<List<CurrentWeatherResponse>> {
         return weatherDao.getFavourite()
     }
@@ -49,7 +49,7 @@ class LocalData(context: Context) : InterfaceLocalData {
         weatherDao.insertAlert(alert)
     }
 
-    // Retrieve all saved alerts
+    // Retrieve all saved alerts using flow
     override fun getAlertsData(): Flow<List<AlertData>> {
         return weatherDao.getAlertsData()
     }
@@ -60,14 +60,14 @@ class LocalData(context: Context) : InterfaceLocalData {
     }
 
 
-    // ---- Location-related methods ----
+    // ---- Location-related methods ---- //
 
     // Save a location (latitude, longitude, cityName, countryName)
     override suspend fun saveLocation(location: LocationData) {
         weatherDao.saveLocation(location)
     }
 
-    // Retrieve saved locations
+    // Retrieve saved locations flow
     override fun getSavedLocations(): Flow<List<LocationData>> {
         return weatherDao.getSavedLocations()
     }

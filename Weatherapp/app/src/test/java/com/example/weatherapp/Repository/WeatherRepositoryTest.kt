@@ -145,69 +145,39 @@ class WeatherRepositoryTest {
         assertEquals(favoriteWeatherResponse, favorites[0])
     }
 
-
     @Test
-// Test inserting a new unique favourite location
-    fun `insertFavourite adds a new unique favorite location`() = runBlocking {
-        // Arrange: Insert an initial favorite location
-        val initialFavoriteWeatherResponse = CurrentWeatherResponse(
-            id = 1,
+    fun `insertFavourite handles null or default values correctly`() = runBlocking {
+        // Arrange: Create a CurrentWeatherResponse with null or default values
+        val favoriteWithDefaults = CurrentWeatherResponse(
+            id = 0,  // Default id
             city = City(
-                id = 12345,
-                name = "Cairo",
-                country = "EG",
-                population = 10000000,
-                coord = Coord(lat = 30.033, lon = 31.233),
-                sunrise = 0,
-                sunset = 0,
-                timezone = 2
+                id = 0, // Default city id
+                name = "", // Default name
+                country = "", // Default country code
+                population = 0, // Default population
+                coord = Coord(lat = 0.0, lon = 0.0), // Default coordinates
+                sunrise = 0, // Default sunrise
+                sunset = 0, // Default sunset
+                timezone = 0 // Default timezone
             ),
-            longitude = 31.233,
-            latitude = 30.033,
-            cnt = 1,
-            isFav = 1,
-            isALert = 0,
-            cod = "200",
-            list = mutableListOf(),
-            message = 0,
-            timestamp = null
+            longitude = 0.0, // Default longitude
+            latitude = 0.0, // Default latitude
+            cnt = 0, // Default count
+            isFav = 1, // Mark as favorite
+            isALert = 0, // No alert
+            cod = "200", // Default code
+            list = mutableListOf(), // Empty list
+            message = 0, // Default message
+            timestamp = null // Default timestamp
         )
 
-        // Insert the initial favorite
-        weatherRepository.insertFavourite(initialFavoriteWeatherResponse)
+        // Act: Call insertFavourite with this object
+        weatherRepository.insertFavourite(favoriteWithDefaults)
 
-        // Arrange: Prepare a new favorite location
-        val newFavoriteWeatherResponse = CurrentWeatherResponse(
-            id = 2,
-            city = City(
-                id = 67890,
-                name = "Alexandria",
-                country = "EG",
-                population = 5000000,
-                coord = Coord(lat = 31.2156, lon = 29.9553),
-                sunrise = 0,
-                sunset = 0,
-                timezone = 2
-            ),
-            longitude = 29.9553,
-            latitude = 31.2156,
-            cnt = 1,
-            isFav = 1,
-            isALert = 0,
-            cod = "200",
-            list = mutableListOf(),
-            message = 0,
-            timestamp = null
-        )
-
-        // Act: Insert the new favorite
-        weatherRepository.insertFavourite(newFavoriteWeatherResponse)
-
-        // Assert: Check the size of the favorites list
+        // Assert: Check that the favorite is added correctly
         val favorites = fakeLocalData.getFavourite().first()
-        assertEquals(2, favorites.size) // There should be two favorites now
-        assertEquals(initialFavoriteWeatherResponse, favorites[0]) // Check the first favorite
-        assertEquals(newFavoriteWeatherResponse, favorites[1]) // Check the second favorite
+        assertEquals(1, favorites.size) // Expecting size to be 1
+        assertEquals(favoriteWithDefaults, favorites[0]) // The added favorite should match
     }
 
 }

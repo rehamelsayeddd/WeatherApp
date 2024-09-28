@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
-import com.example.weatherapp.LocationData
+import com.example.weatherapp.ForecastModel.LocationData
 import com.example.weatherapp.OneCall.Model.AlertData
 import com.example.weatherapp.OneCall.Model.OneCallApi
 

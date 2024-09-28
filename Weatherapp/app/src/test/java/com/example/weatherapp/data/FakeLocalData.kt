@@ -1,6 +1,6 @@
 import com.example.weatherapp.Database.InterfaceLocalData
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
-import com.example.weatherapp.LocationData
+import com.example.weatherapp.ForecastModel.LocationData
 import com.example.weatherapp.OneCall.Model.AlertData
 import com.example.weatherapp.OneCall.Model.OneCallApi
 import kotlinx.coroutines.flow.Flow

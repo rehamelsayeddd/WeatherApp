@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.IntentSender
 import android.location.Geocoder
@@ -24,12 +23,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.Database.LocalData
-import com.example.weatherapp.ForecastApiState
+import com.example.weatherapp.Home.ViewModel.ForecastApiState
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
 import com.example.weatherapp.ForecastModel.ForeCastData
 import com.example.weatherapp.Home.ViewModel.HomeViewModel
 import com.example.weatherapp.Home.ViewModel.HomeViewModelFactory
-import com.example.weatherapp.Network.NetworkUtil
 import com.example.weatherapp.Network.RemoteData
 import com.example.weatherapp.Network.RetrofitInstance
 import com.example.weatherapp.Network.WeatherApiService

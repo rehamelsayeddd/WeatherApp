@@ -63,6 +63,7 @@ class AlarmReceiver : BroadcastReceiver(){
         var alertMessage= getString(context,R.string.nowarnings)
         repository = WeatherRepository.getInstance(remoteDataSource,localDataSourceInte)
 
+        //fetching from api
         CoroutineScope(Dispatchers.IO).launch {
             repository.getAlerts(lat,lon,"metric", API_KEY,language).collect{ alertsData->
                 alertResults = alertsData!!

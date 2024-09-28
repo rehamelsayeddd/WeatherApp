@@ -1,4 +1,4 @@
-package com.example.weatherapp
+package com.example.weatherapp.Favourite.ViewModel
 
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
 

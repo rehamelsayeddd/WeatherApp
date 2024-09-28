@@ -1,6 +1,6 @@
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.weatherapp.Favourite.ViewModel.FavouriteViewModel
-import com.example.weatherapp.FavouriteState
+import com.example.weatherapp.Favourite.ViewModel.FavouriteState
 import com.example.weatherapp.ForecastModel.City
 import com.example.weatherapp.ForecastModel.Coord
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
@@ -8,8 +8,6 @@ import com.example.weatherapp.Repository.FakeRepositoryTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain

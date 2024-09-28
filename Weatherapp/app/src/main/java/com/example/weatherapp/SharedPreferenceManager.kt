@@ -108,16 +108,14 @@ class SharedPreferenceManager private constructor(context: Context){
 enum class SharedKey {
     LANGUAGE,
     GPS, //location choice ==> gps or map
-    MAP, //type of the map ==> home or fav or alert.
+    MAP, //type of the map
     Home, // save lan and long to home
-    FAV, //save lan and long to fave
+    FAV,
     ALERT,
     UNITS,
     CURMAP,
     TEMP_UNIT,
     ALERT_TYPE,
-
-
 
 }
 

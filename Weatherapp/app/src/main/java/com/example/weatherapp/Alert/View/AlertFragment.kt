@@ -121,7 +121,7 @@ class AlertFragment : Fragment(),OnClickInterface {
         binding.alertRV.layoutManager = linearLayoutManager
 
         viewModel.alerts.observe(viewLifecycleOwner) { alerts ->
-            alertAdapter.setList(alerts) // Update RecyclerView with new alerts
+            alertAdapter.setList(alerts) // observe alert from VM and update recylcer view
         }
 
         binding.btnCompleteAction.setOnClickListener {
@@ -144,6 +144,8 @@ class AlertFragment : Fragment(),OnClickInterface {
         val dialogBinding = AlertDialogBinding.inflate(layoutInflater)
         val dialog = Dialog(requireContext())
         dialog.setContentView(dialogBinding.root)
+
+        //to pick time and date for alert
         dialogBinding.fromBtn.setOnClickListener {
             pickTime(dialogBinding, 1)
             pickDate(dialogBinding, 1)
@@ -152,6 +154,8 @@ class AlertFragment : Fragment(),OnClickInterface {
             pickTime(dialogBinding, 2)
             pickDate(dialogBinding, 2)
         }
+
+        //handle choice bet notfication / alarm
         dialogBinding.timeCalenderRadioGroup.setOnCheckedChangeListener{group , checkedId ->
             if(group.checkedRadioButtonId == R.id.notificationRBtn) {
                 edit.putString(SharedKey.ALERT_TYPE.name,"notification")
@@ -163,6 +167,7 @@ class AlertFragment : Fragment(),OnClickInterface {
             }
         }
 
+        //handle save button to create alert
         dialogBinding.OkBtn.setOnClickListener {
             if (timeOne != null && dateOneSelected != null &&
                 timeTwo != null && dateTwoSelected != null &&
@@ -334,6 +339,7 @@ class AlertFragment : Fragment(),OnClickInterface {
         startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION),20)
     }
 
+    //handling if the user deletes the alert
     override fun onAlarmClick(alertData: AlertData) {
         var noOfDays = alertData.milleDateTo - alertData.milleDateFrom
         val days = TimeUnit.MILLISECONDS.toDays(noOfDays)

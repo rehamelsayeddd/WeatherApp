@@ -4,15 +4,13 @@ import android.util.Log
 import com.example.weatherapp.Database.InterfaceLocalData
 import com.example.weatherapp.Database.LocalData
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
-import com.example.weatherapp.LocationData
+import com.example.weatherapp.ForecastModel.LocationData
 import com.example.weatherapp.Network.InterfaceRemoteData
 import com.example.weatherapp.Network.RemoteData
 import com.example.weatherapp.OneCall.Model.AlertData
 import com.example.weatherapp.OneCall.Model.OneCallApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
 
 
 class WeatherRepository(
@@ -49,6 +47,8 @@ class WeatherRepository(
 //
 //        return response
 //    }
+
+    //using flow
     override suspend fun fetchFiveDaysInfo(
         latitude: Double,
         longitude: Double,
@@ -65,12 +65,12 @@ class WeatherRepository(
 
     }
 
-    // Retrieve weather data for HomeFragment when offline
+    // Retrieve weather data for HomeFragment when offline using flow
     override fun getWeatherData(): Flow<CurrentWeatherResponse> {
         return localData.getWeatherData()
     }
 
-    // Fetch weather alerts from the network and save them to the local database
+    // Fetch weather alerts from the network and save them to the local database using flow
     override suspend fun getAlerts(
         latitude: Double,
         longitude: Double,
@@ -93,7 +93,7 @@ class WeatherRepository(
         localData.insertFavourite(favorite)
     }
 
-    // Retrieve all favorite locations
+    // Retrieve all favorite locations using flow
     override fun getFavourite(): Flow<List<CurrentWeatherResponse>> {
         return localData.getFavourite()
     }
@@ -120,7 +120,7 @@ class WeatherRepository(
 
     //Save a location
     override suspend fun saveLocation(
-        latitude: Double,          // Correct type: Double for latitude
+        latitude: Double,
         longitude: Double,
         cityName: String,
         countryName: String
@@ -136,7 +136,7 @@ class WeatherRepository(
 
 
 
-    // Retrieve saved locations
+    // Retrieve saved locations using flow
     override fun getSavedLocations(): Flow<List<LocationData>> {
         return localData.getSavedLocations()
     }

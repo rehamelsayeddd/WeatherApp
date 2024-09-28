@@ -10,23 +10,15 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.weatherapp.Database.LocalData
-import com.example.weatherapp.Favourite.View.FavouriteFragment
-import com.example.weatherapp.Favourite.ViewModel.FavouriteViewModel
-import com.example.weatherapp.Favourite.ViewModel.FavouriteViewModelFactory
-import com.example.weatherapp.LocationData
 import com.example.weatherapp.Map.ViewModel.MapViewModel
 import com.example.weatherapp.Map.ViewModel.MapViewModelFactory
 import com.example.weatherapp.Network.RemoteData
-import com.example.weatherapp.Network.RetrofitInstance
 import com.example.weatherapp.R
 import com.example.weatherapp.Repository.WeatherRepository
-import com.example.weatherapp.View.HomeActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -35,7 +27,6 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.libraries.places.widget.Autocomplete
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
@@ -135,6 +126,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    //listen to search query flow for changes
     private fun observeSearchQuery() {
         lifecycleScope.launch {
             searchQueryFlow
@@ -161,6 +153,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         })
     }
 
+    //to fetch location from geocoder through location name (query)
     private fun searchForLocation(locationName: String) {
         try {
             val addresses = geocoder.getFromLocationName(locationName, 1)
@@ -208,7 +201,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         } else {
-            // Handle permission request if necessary
+
         }
     }
 
