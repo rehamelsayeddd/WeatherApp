@@ -66,7 +66,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         const val REQUEST_TYPE = "request_type" // New constant to identify request type
         const val FROM_SETTINGS = "from_settings" // New constant for settings request
-        const val FROM_FAVORITES = "from_favorites" // New constant for favorites request
+        const val FROM_FAVORITES  = "from_favorites" // New constant for favorites request
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

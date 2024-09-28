@@ -496,10 +496,6 @@ class HomeFragment : Fragment() {
 
         dailyAdapter = DailyAdapter(sharedPrefManager)
 
-
-
-
-
         // Set up RecyclerViews
         binding.todayDetailsRecView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.todayDetailsRecView.adapter = todayAdapter
