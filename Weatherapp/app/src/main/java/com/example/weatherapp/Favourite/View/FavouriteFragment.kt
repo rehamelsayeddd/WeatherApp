@@ -11,12 +11,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.Database.LocalData
 import com.example.weatherapp.Favourite.ViewModel.FavouriteViewModel
 import com.example.weatherapp.Favourite.ViewModel.FavouriteViewModelFactory
-import com.example.weatherapp.FavouriteState
+import com.example.weatherapp.Favourite.ViewModel.FavouriteState
 import com.example.weatherapp.ForecastModel.City
 import com.example.weatherapp.ForecastModel.Coord
 import com.example.weatherapp.Map.View.MapActivity

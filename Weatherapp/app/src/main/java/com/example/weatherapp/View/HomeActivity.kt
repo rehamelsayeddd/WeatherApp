@@ -16,6 +16,8 @@ import com.example.weatherapp.Home.View.HomeFragment
 import com.example.weatherapp.Network.NetworkUtil
 import com.example.weatherapp.R
 import com.example.weatherapp.Settings.SettingsFragment
+import com.example.weatherapp.SharedKey
+import com.example.weatherapp.SharedPreferenceManager
 import com.example.weatherapp.databinding.ActivityHomeBinding
 
 import java.util.Locale
@@ -26,23 +28,28 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var networkReceiver: NetworkUtil
     private var isNetworkAvailable: Boolean = false
     private lateinit var navController: NavController
-  //  private lateinit var sharedPreferencesManager: SharedPreferencesManager
+   private lateinit var sharedPreferencesManager: SharedPreferenceManager
+
+    private var isReceiverRegistered: Boolean = false // Flag to track registration
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge() // Enabling edge-to-edge display if necessary
+
+        enableEdgeToEdge()
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-     //   sharedPreferencesManager = SharedPreferencesManager.getInstance(this)
-   //     sharedPreferencesManager.savelocationChoice(SharedKey.GPS.name, "gps")
+        sharedPreferencesManager = SharedPreferenceManager.getInstance(this)
+        sharedPreferencesManager.savelocationChoice(SharedKey.GPS.name, "gps")
 
         // Set locale based on saved preference
-     //   val language = sharedPreferencesManager.getLanguage(SharedKey.LANGUAGE.name, "en")
-       // setLocale(language)
+        val language = sharedPreferencesManager.getLanguage(SharedKey.LANGUAGE.name, "") ?: "en"
+        setLocale(if (language == "ar") "ar" else "en")
+
 
         // Setup BottomNavigationView
-        replaceFragment(HomeFragment())
+       // replaceFragment(HomeFragment())
         setupBottomNavigationView()
 
         // Setup network receiver
@@ -55,6 +62,7 @@ class HomeActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             replaceFragment(HomeFragment())
         }
+        registerNetworkReceiver()
     }
 
     private fun setupBottomNavigationView() {
@@ -83,16 +91,16 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(networkReceiver, filter)
-    }
+//    override fun onStart() {
+//        super.onStart()
+//        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+//        registerReceiver(networkReceiver, filter)
+//    }
 
-    override fun onStop() {
-        super.onStop()
-        unregisterReceiver(networkReceiver)
-    }
+//    override fun onStop() {
+//        super.onStop()
+//        unregisterReceiver(networkReceiver)
+//    }
 
     private fun updateNetworkIndicator() {
         binding.tvNetworkIndicator.visibility = if (isNetworkAvailable) {
@@ -110,13 +118,21 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setLocale(language: String) {
+//        val resources = this.resources
+//        val config = Configuration(resources.configuration)
+//        val locale = Locale(language)
+//        Locale.setDefault(locale)
+//        config.setLocale(locale)
+//        resources.updateConfiguration(config, resources.displayMetrics)
+//        ViewCompat.setLayoutDirection(this.window.decorView, if (language == "ar") ViewCompat.LAYOUT_DIRECTION_RTL else ViewCompat.LAYOUT_DIRECTION_LTR)
+//    }
         val resources = this.resources
         val config = Configuration(resources.configuration)
         val locale = Locale(language)
         Locale.setDefault(locale)
         config.setLocale(locale)
         resources.updateConfiguration(config, resources.displayMetrics)
-        ViewCompat.setLayoutDirection(this.window.decorView, if (language == "ar") ViewCompat.LAYOUT_DIRECTION_RTL else ViewCompat.LAYOUT_DIRECTION_LTR)
+        ViewCompat.setLayoutDirection(window.decorView, if (language == "ar") ViewCompat.LAYOUT_DIRECTION_RTL else ViewCompat.LAYOUT_DIRECTION_LTR)
     }
 
     private fun enableEdgeToEdge() {
@@ -129,8 +145,37 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun registerNetworkReceiver() {
+        if (!isReceiverRegistered) {
+            val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+            registerReceiver(networkReceiver, filter)
+            isReceiverRegistered = true
+        }
+    }
+    private fun unregisterNetworkReceiver() {
+        if (isReceiverRegistered) {
+            unregisterReceiver(networkReceiver)
+            isReceiverRegistered = false
+        }
+    }
+    override fun onStart() {
+        super.onStart()
+        registerNetworkReceiver()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unregisterNetworkReceiver()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(networkReceiver)
+        unregisterNetworkReceiver()
     }
+
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        unregisterReceiver(networkReceiver)
+//    }
 }

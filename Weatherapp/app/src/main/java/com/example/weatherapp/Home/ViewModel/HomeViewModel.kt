@@ -2,9 +2,7 @@ package com.example.weatherapp.Home.ViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.weatherapp.ForecastApiState
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
-import com.example.weatherapp.Network.WeatherApiService
 import com.example.weatherapp.Repository.WeatherRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,11 +15,11 @@ class HomeViewModel(private val repository: WeatherRepository) : ViewModel() {
     private val _forecastState = MutableStateFlow<ForecastApiState>(ForecastApiState.Loading)
     val forecastState: StateFlow<ForecastApiState> get() = _forecastState
 
-    // Fetch weather from network or fallback to Room database
+    // Fetch weather from network
     fun fetchWeather(latitude: Double, longitude: Double, apiKey: String, lang: String, units: String) {
         viewModelScope.launch {
             try {
-                _forecastState.value = ForecastApiState.Loading // Correct reference
+                _forecastState.value = ForecastApiState.Loading
 
                 // Fetch data from network
                 repository.fetchFiveDaysInfo(latitude, longitude, units, apiKey, lang).collect { weatherData ->

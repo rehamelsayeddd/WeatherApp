@@ -23,12 +23,13 @@
     <string name="arabic">Arabic</string>
     <string name="english">English</string>
     <string name="windspeed">Wind Speed</string>
-    <string name="imperial">Imperial</string>
-    <string name="metric">Metric</string>
+    <string name="imperial">Mile/hour</string>
+    <string name="metric">Meter/sec</string>
     <string name="temperature">Temperature</string>
     <string name="celsius">Celsius</string>
     <string name="fahrenheit">Fahrenheit</string>
     <string name="kelvin">Kelvin</string>
+    <string name="favourites">Favourites</string>
     <string name="location">Location</string>
     <string name="map">Map</string>
     <string name="gps">GPS</string>
@@ -47,24 +48,5 @@
     <string name="notsure">No,I\'m not</string>
     <string name="nowarnings">No Warnings</string>
     <string name="enterdatainput">Please enter the Full information</string>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 </resources>

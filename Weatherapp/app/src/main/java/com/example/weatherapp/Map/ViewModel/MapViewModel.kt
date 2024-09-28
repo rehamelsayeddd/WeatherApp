@@ -6,17 +6,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
-import com.example.weatherapp.LocationData
+import com.example.weatherapp.ForecastModel.LocationData
 import com.example.weatherapp.Map.View.MapActivity.Companion.API_KEY
 import com.example.weatherapp.Network.RetrofitInstance
 import com.example.weatherapp.Repository.WeatherRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MapViewModel(private val repository: WeatherRepository) : ViewModel() {
 
-    // Method to fetch weather data from API
+    // Method to fetch weather data from API using live data
     fun fetchWeatherData(latitude: Double, longitude: Double): LiveData<CurrentWeatherResponse> {
         val result = MutableLiveData<CurrentWeatherResponse>()
         viewModelScope.launch {

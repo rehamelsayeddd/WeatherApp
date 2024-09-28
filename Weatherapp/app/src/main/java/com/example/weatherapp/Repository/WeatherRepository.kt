@@ -1,22 +1,22 @@
 package com.example.weatherapp.Repository
 
 import android.util.Log
+import com.example.weatherapp.Database.InterfaceLocalData
 import com.example.weatherapp.Database.LocalData
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
-import com.example.weatherapp.LocationData
+import com.example.weatherapp.ForecastModel.LocationData
+import com.example.weatherapp.Network.InterfaceRemoteData
 import com.example.weatherapp.Network.RemoteData
 import com.example.weatherapp.OneCall.Model.AlertData
 import com.example.weatherapp.OneCall.Model.OneCallApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
 
 
 class WeatherRepository(
-    private val remoteData: RemoteData,
-    private val localData: LocalData
-) {
+    private val remoteData: InterfaceRemoteData,
+    private val localData: InterfaceLocalData
+) : IWeatherRepository {
 
     companion object {
         private var instance: WeatherRepository? = null
@@ -47,7 +47,9 @@ class WeatherRepository(
 //
 //        return response
 //    }
-    suspend fun fetchFiveDaysInfo(
+
+    //using flow
+    override suspend fun fetchFiveDaysInfo(
         latitude: Double,
         longitude: Double,
         units: String,
@@ -63,13 +65,13 @@ class WeatherRepository(
 
     }
 
-    // Retrieve weather data for HomeFragment when offline
-    fun getWeatherData(): Flow<CurrentWeatherResponse> {
+    // Retrieve weather data for HomeFragment when offline using flow
+    override fun getWeatherData(): Flow<CurrentWeatherResponse> {
         return localData.getWeatherData()
     }
 
-    // Fetch weather alerts from the network and save them to the local database
-    suspend fun getAlerts(
+    // Fetch weather alerts from the network and save them to the local database using flow
+    override suspend fun getAlerts(
         latitude: Double,
         longitude: Double,
         units: String,
@@ -87,38 +89,38 @@ class WeatherRepository(
     }
 
     // Insert a favorite location into the database
-    suspend fun insertFavourite(favorite: CurrentWeatherResponse) {
+    override suspend fun insertFavourite(favorite: CurrentWeatherResponse) {
         localData.insertFavourite(favorite)
     }
 
-    // Retrieve all favorite locations
-    fun getFavourite(): Flow<List<CurrentWeatherResponse>> {
+    // Retrieve all favorite locations using flow
+    override fun getFavourite(): Flow<List<CurrentWeatherResponse>> {
         return localData.getFavourite()
     }
 
     // Delete a specific favorite by its longitude and latitude
-    suspend fun deleteFavouriteByLonLat(longitude: Double, latitude: Double) {
+    override suspend fun deleteFavouriteByLonLat(longitude: Double, latitude: Double) {
         localData.deleteFavouriteByLonLat(longitude, latitude)
     }
 
     // Insert an alert into the database
-    suspend fun insertAlert(alert: AlertData) {
+    override suspend fun insertAlert(alert: AlertData) {
         localData.insertAlert(alert)
     }
 
     // Retrieve all saved alerts
-    fun getAlertsData(): Flow<List<AlertData>> {
+    override fun getAlertsData(): Flow<List<AlertData>> {
         return localData.getAlertsData()
     }
 
     // Delete a specific alert
-    suspend fun deleteAlert(alert: AlertData) {
+    override suspend fun deleteAlert(alert: AlertData) {
         localData.deleteAlertDataAll(alert)
     }
 
     //Save a location
-    suspend fun saveLocation(
-        latitude: Double,          // Correct type: Double for latitude
+    override suspend fun saveLocation(
+        latitude: Double,
         longitude: Double,
         cityName: String,
         countryName: String
@@ -134,8 +136,8 @@ class WeatherRepository(
 
 
 
-    // Retrieve saved locations
-    fun getSavedLocations(): Flow<List<LocationData>> {
+    // Retrieve saved locations using flow
+    override fun getSavedLocations(): Flow<List<LocationData>> {
         return localData.getSavedLocations()
     }
 }
