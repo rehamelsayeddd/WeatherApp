@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.FavouriteState
 import com.example.weatherapp.ForecastModel.CurrentWeatherResponse
+import com.example.weatherapp.Repository.IWeatherRepository
 import com.example.weatherapp.Repository.WeatherRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.catch
 
-class FavouriteViewModel(private val repository: WeatherRepository) : ViewModel() {
+class FavouriteViewModel(private val repository: IWeatherRepository) : ViewModel() {
 
     // StateFlow to hold the current state of favorites
     private val _favouriteState = MutableStateFlow<FavouriteState>(FavouriteState.Loading)
