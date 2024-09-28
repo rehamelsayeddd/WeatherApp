@@ -5,9 +5,9 @@ import com.example.weatherapp.OneCall.Model.OneCallApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
-class RemoteData {
+class RemoteData : InterfaceRemoteData {
     private val apiService = RetrofitInstance.api
-     suspend fun getFiveDaysInfo(
+     override suspend fun getFiveDaysInfo(
         latitude: Double,
         longitude: Double,
         units: String,
@@ -33,7 +33,7 @@ class RemoteData {
 //
 //    }
 
-     suspend fun getALerts(
+     override suspend fun getALerts(
         latitude: Double,
         longitude: Double,
         units: String,
